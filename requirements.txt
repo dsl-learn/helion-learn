@@ -1,0 +1,3 @@
+torch==2.9.0
+triton==3.5.0
+helion==0.2.1
