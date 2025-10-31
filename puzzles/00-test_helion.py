@@ -3,22 +3,23 @@ import helion.language as hl
 import torch
 
 
-@helion.kernel(config=helion.Config(block_sizes = [128, 128]))  # The @helion.kernel decorator marks this function for compilation
+@helion.kernel(config=helion.Config(block_sizes = [1024]))  # The @helion.kernel decorator marks this function for compilation
 def example_add(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
     # Host code: Standard PyTorch operations
-    m, n = x.size()
     out = torch.empty_like(x)  # Allocate output tensor
 
+    n_elements = x.size()
     # The hl.tile loop defines the parallel execution structure
-    for tile_m, tile_n in hl.tile([m, n]):
+    for block_size in hl.tile(n_elements):
         # Device code: Everything inside the hl.tile loop runs on GPU
-        out[tile_m, tile_n] = x[tile_m, tile_n] + y[tile_m, tile_n] # Simple element-wise addition expressed w/ pytorch ops
+        out[block_size] = x[block_size] + y[block_size] # Simple element-wise addition expressed w/ pytorch ops
 
     return out  # Return the result back to the host
 
 # Create some sample data
-x = torch.randn(10, 10, device="cuda")
-y = torch.randn(10, 10, device="cuda")
+size = 98432
+x = torch.randn(size, device="cuda")
+y = torch.randn(size, device="cuda")
 
 # Run the kernel
 result = example_add(x, y)
