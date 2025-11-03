@@ -2,3 +2,4 @@ torch==2.9.0
 triton==3.5.0
 triton-runner==0.2.9
 helion==0.2.1
+jaxtyping==0.3.3
